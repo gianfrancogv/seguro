@@ -49,7 +49,7 @@ Seguro.prototype.cotizarSeguro = function () {
 function Interfaz () {}
 
 //Mensaje que se imprime en el HTML
-Interfaz.prototype.mostrarError = function(mensaje, tipo) {
+Interfaz.prototype.mostrarMensaje = function(mensaje, tipo) {
     const div = document.createElement('div');
     if (tipo === 'error') {
         div.classList.add('mensaje', 'error');
@@ -61,7 +61,7 @@ Interfaz.prototype.mostrarError = function(mensaje, tipo) {
 
     setTimeout(function() {
         document.querySelector('.mensaje').remove();
-    }, 3000)
+    }, 1500)
 }
 
 //Imprime el resultado de la cotizacion
@@ -82,13 +82,19 @@ Interfaz.prototype.mostrarResultado = function(seguro, total) {
     const div = document.createElement('div');
     //Insertar informacion
     div.innerHTML = `
-        <p>Tu resumen:</p>
+        <p class='header'>TU RESUMEN</p>
         <p>Marca: ${marca}</p>
         <p>Año: ${seguro.anio}</p>
         <p>Tipo: ${seguro.tipo}</p>
         <p>Total: $ ${total}</p>
     `;
-    resultado.appendChild(div);
+    const spinner = document.querySelector('#cargando img');
+    spinner.style.display = 'block';
+    setTimeout(() => {
+        spinner.style.display = 'none';
+        resultado.appendChild(div);
+    }, 1500);
+    
 }
 
 //Event Listeners
@@ -109,13 +115,19 @@ formulario.addEventListener('submit', function(e) {
 
     //Revisamos que los campos no esten vacíos
     if (marcaSeleccionada === '' || anioSeleccionado === '' || tipo === '') {
-        interfaz.mostrarError('Faltan datos, revisa el formulario y prueba de nuevo', 'error');
+        interfaz.mostrarMensaje('Faltan datos, revisa el formulario y prueba de nuevo', 'error');
     } else {
+        //Limpiar resultados anteriores
+        const resultados = document.querySelector('#resultado div');
+        if (resultados != null) {
+            resultados.remove();
+        }
         const seguro = new Seguro(marcaSeleccionada, anioSeleccionado, tipo);
         //Cotizar seguro
         const cantidad = seguro.cotizarSeguro();
         //Mostrar el resultado
         interfaz.mostrarResultado(seguro, cantidad);
+        interfaz.mostrarMensaje('Cotizando...', 'exito');
     }
 });
 
